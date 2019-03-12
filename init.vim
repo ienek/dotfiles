@@ -29,6 +29,8 @@ call plug#begin(g:plugged_home)
   Plug 'junegunn/fzf.vim'       " fzf support
   Plug 'godlygeek/tabular'      " align text automatically
   Plug 'vimwiki/vimwiki'        " documentation
+  Plug 'benmills/vimux'                   " run command in new tmux pane
+  Plug 'christoomey/vim-tmux-navigator'   " navigate between vim and tmux with ALT+
 call plug#end()
 filetype plugin indent on
 
@@ -114,24 +116,27 @@ let g:UltiSnipsEditSplit="vertical"
 nnoremap <silent> <C-p> :FZF<cr>
 let g:fzf_layout = { 'down': '10' }
 
-" Close vim on last deleted buffer and map q
-function! CloseOnLast()
-  let cnt = 0
+" vimux configuration
+" Prompt for a command to run
+map <Leader>vp :VimuxPromptCommand<CR>
+" Run last command executed by VimuxRunCommand
+map <Leader>vl :VimuxRunLastCommand<CR>
+" Inspect runner pane
+map <Leader>vi :VimuxInspectRunner<CR>
+" Close vim tmux runner opened by VimuxRunCommand
+map <Leader>vq :VimuxCloseRunner<CR>
+" Interrupt any command running in the runner pane
+map <Leader>vx :VimuxInterruptRunner<CR>
+" Zoom the runner pane (use <bind-key> z to restore runner pane)
+map <Leader>vz :call VimuxZoomRunner()<CR>
 
-  for i in range(0, bufnr("$"))
-    if buflisted(i)
-      let cnt += 1
-    endif
-  endfor
-
-  if cnt <= 1
-    q
-  else
-    bw
-  endif
-endfunction
-
-nnoremap <silent> q :call CloseOnLast()<CR>
+" vim-tmux-navigator configuration
+let g:tmux_navigator_no_mappings = 1
+nnoremap <silent> <A-h> :TmuxNavigateLeft<cr>
+nnoremap <silent> <A-j> :TmuxNavigateDown<cr>
+nnoremap <silent> <A-k> :TmuxNavigateUp<cr>
+nnoremap <silent> <A-l> :TmuxNavigateRight<cr>
+nnoremap <silent> <A-/> :TmuxNavigatePrevious<cr>
 
 " Some XML help
 " Following cmd may help for checking xml consistency
@@ -149,20 +154,6 @@ augroup END
 
 " Buffer dealing, not windows
 map <silent> <leader>d :bp\|bd #<CR>
-" Turn on backup option
-"set backup
-" Where to store backups
-"set backupdir=~/.vimbackup
-" Make backup before overwriting the current buffer
-"set writebackup
-" Overwrite the original backup file
-"set backupcopy=yes
-" Meaningful backup name, ex: filename@2015-04-05.14:59
-"au BufWritePre * let &bex = '@' . strftime("%F.%H:%M")
-" Turn on persistent undo
-"set undofile
-" Set a directory to store the undo history
-"set undodir=~/.vimundo
 
 " cheatsheet
 " CTRL-W    delete word to the left of cursor
